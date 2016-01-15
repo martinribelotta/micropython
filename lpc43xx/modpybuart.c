@@ -27,7 +27,7 @@
 #include "py/runtime.h"
 #include "board.h"
 #include "modpyb.h"
-#include "ciaanxp_mphal.h"
+#include "lpc43xx_mphal.h"
 
 #include "py/stream.h"
 

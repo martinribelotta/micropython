@@ -26,13 +26,13 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <ciaa-nxp/lpc43_flash.h>
-#include <ciaa-nxp/lpc43_storage.h>
+#include <lpc43_flash.h>
+#include <lpc43_storage.h>
 #include <string.h>
 #include <board.h>
 
 #include "py/obj.h"
-#include "ciaanxp_mphal.h"
+#include "lpc43xx_mphal.h"
 
 STATIC byte flash_cache_mem[8 * 1024] __attribute__((aligned(4)));
 #define CACHE_MEM_START_ADDR (&flash_cache_mem[0])

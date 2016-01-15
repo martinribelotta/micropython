@@ -27,7 +27,7 @@
 #include <board.h>
 #include <iap.h>
 
-#include <ciaa-nxp/lpc43_flash.h>
+#include <lpc43_flash.h>
 #include <py/mphal.h>
 
 #define __RAM_FUNC __attribute__ ((section(".ramfunc")))

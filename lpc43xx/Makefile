@@ -1,5 +1,7 @@
 include ../py/mkenv.mk
 
+BOARD ?= edu_ciaa
+
 # qstr definitions (must come before including py.mk)
 QSTR_DEFS = qstrdefsport.h
 
@@ -15,7 +17,7 @@ INC += -I../stmhal
 INC += -I../teensy
 INC += -I../lib/mp-readline
 INC += -I../lib/timeutils
-INC += -Iboard_ciaa_edu_4337/inc/ -Ilpc_chip_43xx/inc/
+INC += -Iboard/$(BOARD)/inc/ -Ilpc_chip_43xx/inc/
 INC += -I$(BUILD)
 
 COPT += -DCORE_M4 -D__USE_LPCOPEN -D__USE_NEWLIB
@@ -31,7 +33,9 @@ else
 CFLAGS += -Os -DNDEBUG
 endif
 
-LDFLAGS = $(ARCH_FLAGS) -nostdlib -T ciaa_lpc4337.ld -Wl,-Map=$@.map -Wl,--cref
+OOCD_CFG = board/$(BOARD)/openocd.cfg
+
+LDFLAGS = $(ARCH_FLAGS) -nostdlib -T lpc4337.ld -Wl,-Map=$@.map -Wl,--cref
 LIBS =
 
 SRC_C = \
@@ -39,8 +43,8 @@ SRC_C = \
 	sysinit.c \
 	system.c \
 	cr_startup_lpc43xx.c \
-	ciaanxp_mphal.c \
-	ciaa_help.c \
+	lpc43xx_mphal.c \
+	help.c \
 	bootSys.c  \
 	lpc43_diskio.c \
 	lpc43_flash.c \
@@ -74,12 +78,9 @@ SRC_C = \
 	stmhal/pybstdio.c \
 	stmhal/bufhelper.c \
 	$(wildcard lpc_chip_43xx/src/*.c) \
-	$(wildcard board_ciaa_edu_4337/src/*.c) \
-	$(wildcard board_ciaa_edu_4337/src/ponchos/*.c)
+	$(wildcard board/$(BOARD)/src/*.c)
 
-SRC_S = \
-#	startup_stm32f40xx.s \
-	gchelper.s \
+-include board/$(BOARD)/board.mk
 
 OBJ = $(PY_O) $(addprefix $(BUILD)/, $(SRC_C:.c=.o) $(SRC_S:.s=.o))
 
@@ -96,27 +97,19 @@ $(BUILD)/firmware.bin: $(BUILD)/firmware.elf
 PHONY: debug openocd download erase
 
 download: $(BUILD)/firmware.bin
-	@openocd -f ciaa-nxp.cfg \
+	@openocd -f $(OOCD_CFG) \
 		-c "init" \
 		-c "halt 0" \
 		-c "flash write_image erase unlock $^ 0x1A000000 bin" \
 		-c "reset run" \
 		-c "shutdown"
 
-fsdownload: $(BUILD)/fs.bin
-	@openocd -f ciaa-nxp.cfg \
-		-c "init" \
-		-c "halt 0" \
-		-c "flash write_image erase unlock $^ 0x1B000000 bin" \
-		-c "reset run" \
-		-c "shutdown"
-
 erase:
-	@openocd -f ciaa-nxp.cfg \
+	@openocd -f $(OOCD_CFG) \
 		-c "init" -c "halt 0" -c "flash erase_sector 0 0 last" -c "shutdown"
 
 openocd:
-	@openocd -f ciaa-nxp.cfg
+	@openocd -f $(OOCD_CFG)
 
 debug: $(BUILD)/firmware.elf
 	$(CROSS_COMPILE)gdb $(BUILD)/firmware.elf -ex "target remote :3333" -ex "mon reset halt" -ex "load"

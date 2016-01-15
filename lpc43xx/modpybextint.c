@@ -31,7 +31,7 @@
 #include "board.h"
 #include "modpyb.h"
 #include "modpybpin.h"
-#include "ciaanxp_mphal.h"
+#include "lpc43xx_mphal.h"
 
 typedef struct {
     mp_obj_base_t base;

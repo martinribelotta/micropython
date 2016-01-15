@@ -27,7 +27,7 @@
 #include "py/runtime.h"
 #include "board.h"
 #include "modpyb.h"
-#include "ciaanxp_mphal.h"
+#include "lpc43xx_mphal.h"
 
 typedef struct _pyb_adc_obj_t {
     mp_obj_base_t base;

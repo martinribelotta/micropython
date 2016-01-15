@@ -25,7 +25,7 @@
  */
 
 #include <string.h>
-#include "ciaanxp_mphal.h"
+#include "lpc43xx_mphal.h"
 #include "board.h"
 
 static int interrupt_char;
