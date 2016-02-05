@@ -223,6 +223,12 @@ __STATIC_INLINE void Board_USB1_DisableVbus(void)
 }
 
 /**
+ * @brief	Systick board handler
+ * @return	Nothing
+ */
+void Board_Systick(void);
+
+/**
  * @brief	Initializes board specific GPIO Interrupt
  * @return	Nothing
  */

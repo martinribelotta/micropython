@@ -85,6 +85,12 @@ typedef struct {
 } ExtIntData;
 static ExtIntData extIntData[4];
 
+void Board_Systick(void) {
+	Board_UART_tick_ms();
+	Board_LED_PWM_tick_ms();
+	Board_KEYBOARD_tick_ms();
+}
+
 //================================================[RTC Management]========================================================
 static void(*rtcCallback)(void*);
 static void* rtcCallbackArg;
@@ -1462,6 +1468,8 @@ void Board_Init(void)
 
 	/* Initialize SPI pins */
 	Board_SSP_Init();
+
+	Board_Buttons_Init();
 
 	/* Initialize RTC module */
 	//Board_RTC_Init();
