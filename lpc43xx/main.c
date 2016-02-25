@@ -101,7 +101,7 @@ soft_reset:
 
 
 	// check new script from IDE
-	boot();
+	// boot();
 	//__________________________
 
 

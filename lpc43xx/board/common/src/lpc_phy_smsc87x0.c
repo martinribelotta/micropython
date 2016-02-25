@@ -32,6 +32,8 @@
 #include "chip.h"
 #include "lpc_phy.h"
 
+#ifdef USE_PHY_SMSC87x0
+
 /** @defgroup SMSC87X0_PHY BOARD: PHY status and control driver for the SMSC 87x0
  * @ingroup BOARD_PHY
  * Various functions for controlling and monitoring the status of the
@@ -264,6 +266,8 @@ uint32_t lpcPHYStsPoll(void)
 
 	return physts;
 }
+
+#endif
 
 /**
  * @}

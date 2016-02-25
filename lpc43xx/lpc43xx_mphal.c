@@ -96,6 +96,7 @@ void mp_hal_stdout_tx_strn_cooked(const char *str, mp_uint_t len) {
 	}
 }
 
+#if 0
 // RS232 Functions
 uint32_t mp_hal_rs232_write(uint8_t const * const buffer, uint32_t size,
 		uint32_t delay) {
@@ -396,3 +397,4 @@ void mp_hal_disableAlarmRTC(void) {
 void mp_hal_setCallbackRTC(void (*function)(void*), void* arg) {
 	Board_RTC_setAlarmCallback(function, arg);
 }
+#endif

@@ -106,7 +106,6 @@ STATIC mp_obj_t pyb_led_intensity(mp_uint_t n_args, const mp_obj_t *args) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(pyb_led_intensity_obj, 1, 2, pyb_led_intensity);
 
-
 STATIC const mp_map_elem_t pyb_led_locals_dict_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR_on), (mp_obj_t)&pyb_led_on_obj },
     { MP_OBJ_NEW_QSTR(MP_QSTR_off), (mp_obj_t)&pyb_led_off_obj },

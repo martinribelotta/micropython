@@ -17,7 +17,7 @@ INC += -I../stmhal
 INC += -I../teensy
 INC += -I../lib/mp-readline
 INC += -I../lib/timeutils
-INC += -Iboard/$(BOARD)/inc/ -Ilpc_chip_43xx/inc/
+INC += -Iboard/$(BOARD)/inc/ -Ilpc_chip_43xx/inc/ -Iboard/common/inc/
 INC += -I$(BUILD)
 
 COPT += -DCORE_M4 -D__USE_LPCOPEN -D__USE_NEWLIB
@@ -51,21 +51,6 @@ SRC_C = \
 	lpc43_storage.c \
 	ffconf.c \
 	moduos.c \
-	modpyb.c \
-	modpybled.c \
-	modpybswitch.c \
-	modpybuart.c \
-	modpybpin.c \
-	modpybextint.c \
-	modpybdac.c \
-	modpybtimer.c \
-	modpybpwm.c \
-	modpybadc.c \
-	modpybkeyboard.c \
-	modpyblcd44780u.c \
-	modpybeeprom.c \
-	modpybspi.c \
-	modpybrtc.c \
 	lib/fatfs/ff.c \
 	lib/fatfs/option/ccsbcs.c \
 	lib/mp-readline/readline.c \
@@ -78,7 +63,24 @@ SRC_C = \
 	stmhal/pybstdio.c \
 	stmhal/bufhelper.c \
 	$(wildcard lpc_chip_43xx/src/*.c) \
-	$(wildcard board/$(BOARD)/src/*.c)
+	$(wildcard board/$(BOARD)/src/*.c) \
+	$(wildcard board/common/src/*.c) \
+	modpyb.c \
+	#modpybpin.c \
+	modpybuart.c \
+	modpybextint.c \
+	modpybadc.c \
+	modpybdac.c \
+	modpybeeprom.c \
+	modpybtimer.c \
+	modpybspi.c \
+	modpybrtc.c \
+	modpybpwm.c \
+	modpybswitch.c \
+	modpybled.c \
+	modpybkeyboard.c \
+	modpyblcd44780u.c \
+	#
 
 -include board/$(BOARD)/board.mk
 

@@ -41,6 +41,7 @@ void mp_hal_set_interrupt_char(int c);
 //void mp_hal_stdout_tx_strn(const char *str, mp_uint_t len);
 //void mp_hal_stdout_tx_strn_cooked(const char *str, mp_uint_t len);
 
+#if 0
 // RS232 Functions
 uint32_t mp_hal_rs232_write(uint8_t const * const buffer, uint32_t size, uint32_t delay);
 void mp_hal_rs232_setRxBuffer(uint8_t* pBuffer,uint32_t size,uint32_t timeout, uint8_t finalByte);
@@ -145,5 +146,6 @@ void mp_hal_setAlarmTimeRTC(uint32_t hr,uint32_t min, uint32_t sec, uint32_t day
 void mp_hal_getAlarmTimeRTC(uint32_t* hr,uint32_t* min, uint32_t* sec, uint32_t* day, uint32_t* mon, uint32_t* yr,uint32_t* dayOfWeek);
 void mp_hal_disableAlarmRTC(void);
 void mp_hal_setCallbackRTC(void(*function)(void*),void* arg);
+#endif
 
 #endif

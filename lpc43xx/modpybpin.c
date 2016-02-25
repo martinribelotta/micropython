@@ -32,23 +32,6 @@
 #include "modpyb.h"
 #include "lpc43xx_mphal.h"
 
-typedef struct _pyb_gpio_obj_t {
-    mp_obj_base_t base;
-    mp_obj_t callback;
-} pyb_gpio_obj_t;
-
-STATIC pyb_gpio_obj_t pyb_gpio_obj[] = {
-    {{&pyb_gpio_type}},
-    {{&pyb_gpio_type}},
-    {{&pyb_gpio_type}},
-    {{&pyb_gpio_type}},
-    {{&pyb_gpio_type}},
-    {{&pyb_gpio_type}},
-    {{&pyb_gpio_type}},
-    {{&pyb_gpio_type}},
-    {{&pyb_gpio_type}},
-};
-
 #define GPIO_ID(obj) ((obj) - &pyb_gpio_obj[0])
 #define NUM_GPIO 8
 
