@@ -45,6 +45,8 @@
 #include "lib/utils/pyexec.h"
 #include "genhdr/mpversion.h"
 
+#include <board.h>
+
 pyexec_mode_kind_t pyexec_mode_kind = PYEXEC_MODE_FRIENDLY_REPL;
 STATIC bool repl_display_debugging_info = 0;
 

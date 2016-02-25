@@ -83,7 +83,7 @@ extern "C" {
 /** Board UART used for debug output and input using the DEBUG* macros. This
     is also the port used for Board_UARTPutChar, Board_UARTGetChar, and
 	Board_UARTPutSTR functions. */
-#define DEBUG_UART LPC_USART0
+#define DEBUG_UART LPC_USART2
 
 /**
  * @}
@@ -92,7 +92,8 @@ extern "C" {
 /* Board name */
 #define BOARD_CIAA_EDU_NXP_4337
 
-
+#define MICROPY_HW_BOARD_NAME "EDU-CIAA-NXP"
+#define MICROPY_HW_MCU_NAME "LPC4337"
 
 
 /* GPIOs */

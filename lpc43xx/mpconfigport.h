@@ -137,9 +137,6 @@ extern const struct _mp_obj_module_t mp_module_utime;
 
 //static inline void mp_hal_set_interrupt_char(char c) {}
 
-#define MICROPY_HW_BOARD_NAME "EDU-CIAA-NXP"
-#define MICROPY_HW_MCU_NAME "LPC4337"
-
 #define MP_STATE_PORT MP_STATE_VM
 
 #define MICROPY_PORT_ROOT_POINTERS \
