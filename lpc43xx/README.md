@@ -15,6 +15,10 @@ Support for NXP LPC43XX MCU
 - Open a terminal on serial USB converter 2 (/dev/ttyUSB1 usualy)
 - A python REPL interpreter is available via USB UART (DEBUG connector)
 
+## Supported boards
+- Bambino210E: `make BOARD=bambino210`
+- EDU-CIAA-NXP: `make BOARD=edu_ciaa`
+
 ##### Keybindings
 ###### Fancy REPL (aka `>>>` promt)
 - CTRL+D restart interpreter (not board) aka soft reset
