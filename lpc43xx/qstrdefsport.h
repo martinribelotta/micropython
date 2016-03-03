@@ -17,6 +17,17 @@ Q(callback)
 
 Q(collections)
 
+Q(localtime)
+Q(mktime)
+Q(time)
+Q(sleep)
+Q(sleep_ms)
+Q(sleep_us)
+Q(ticks_ms)
+Q(ticks_us)
+Q(ticks_cpu)
+Q(ticks_diff)
+
 Q(UART)
 Q(baudrate)
 Q(bits)
