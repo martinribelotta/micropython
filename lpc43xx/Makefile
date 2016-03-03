@@ -41,13 +41,13 @@ MOD_SRC_C = $(addprefix mods/,\
 	modpyb.c \
 	modpybrtc.c \
 	modpybuart.c \
+	modutime.c \
 	)
 	#modpybpin.c \
 	modpybextint.c \
 	modpybadc.c \
 	modpybdac.c \
 	modpybeeprom.c \
-	modpybtimer.c \
 	modpybspi.c \
 	modpybpwm.c \
 	modpybswitch.c \
