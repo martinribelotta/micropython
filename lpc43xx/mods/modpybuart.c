@@ -179,7 +179,7 @@ mp_uint_t uart_rx_any(pyb_uart_obj_t *self) {
 // Returns true if something available, false if not.
 STATIC bool uart_rx_wait(pyb_uart_obj_t *self, uint32_t timeout) {
     uint32_t start = HAL_GetTick();
-    while (HAL_GetTick() - start >= timeout) {
+    while (HAL_GetTick() - start < timeout) {
         if (!RingBuffer_IsEmpty(&self->uart.read_buffer) ||
         		Chip_UART_CheckLineStatus(self->uart.Instance, UART_LSR_RDR) != 0) {
             return true; // have at least 1 char ready for reading
@@ -204,7 +204,7 @@ int uart_rx_char(pyb_uart_obj_t *self) {
 // Returns true if can write, false if can't.
 STATIC bool uart_tx_wait(pyb_uart_obj_t *self, uint32_t timeout) {
     uint32_t start = HAL_GetTick();
-    while ((HAL_GetTick() - start >= timeout)) {
+    while ((HAL_GetTick() - start < timeout)) {
         if (Chip_UART_CheckBusy(self->uart.Instance) == RESET) {
             return true; // tx register is empty
         }
@@ -232,11 +232,11 @@ HAL_StatusTypeDef Chip_UART_SendBlockingTout(LPC_USART_T *pUART, const void *dat
 	while (numBytes > 0) {
 		/* Wait for space in FIFO */
 		uint32_t start = HAL_GetTick();
-		while ((Chip_UART_ReadLineStatus(DEBUG_UART) & UART_LSR_THRE) == 0) {
+		while ((Chip_UART_ReadLineStatus(pUART) & UART_LSR_THRE) == 0) {
 			if ((HAL_GetTick() - start) > tout)
 				return HAL_TIMEOUT;
 		}
-		Chip_UART_SendByte(DEBUG_UART, (uint8_t) *p8++);
+		Chip_UART_SendByte(pUART, (uint8_t) *p8++);
 		numBytes--;
 	}
 
@@ -282,6 +282,16 @@ void uart_irq_handler(mp_uint_t uart_id) {
     Chip_UART_RXIntHandlerRB(self->uart.Instance, &self->uart.read_buffer);
 }
 
+STATIC int config_to_nbits(int config) {
+	switch(config) {
+	case UART_LCR_WLEN5: return 5;
+	case UART_LCR_WLEN6: return 6;
+	case UART_LCR_WLEN7: return 7;
+	case UART_LCR_WLEN8: return 8;
+	default: return 0;
+	}
+}
+
 /******************************************************************************/
 /* Micro Python bindings                                                      */
 
@@ -290,10 +300,7 @@ STATIC void pyb_uart_print(const mp_print_t *print, mp_obj_t self_in, mp_print_k
     if (!self->is_enabled) {
         mp_printf(print, "UART(%u)", self->uart_id);
     } else {
-        mp_int_t bits = self->uart.Init.WordLength;
-        if (self->uart.Init.Parity != UART_LCR_PARITY_DIS) {
-            bits -= 1;
-        }
+        mp_int_t bits = config_to_nbits(self->uart.Init.WordLength);
         mp_printf(print, "UART(%u, baudrate=%u, bits=%u, parity=",
             self->uart_id, self->uart.Init.BaudRate, bits);
         if (self->uart.Init.Parity == UART_LCR_PARITY_DIS) {
@@ -306,6 +313,16 @@ STATIC void pyb_uart_print(const mp_print_t *print, mp_obj_t self_in, mp_print_k
             self->timeout, self->timeout_char,
             RingBuffer_GetSize(&self->uart.read_buffer));
     }
+}
+
+STATIC int nbits_to_config(int n) {
+	switch(n) {
+	case 5: return UART_LCR_WLEN5;
+	case 6: return UART_LCR_WLEN6;
+	case 7: return UART_LCR_WLEN7;
+	case 8: return UART_LCR_WLEN8;
+	default: return-1;
+	}
 }
 
 /// \method init(baudrate, bits=8, parity=None, stop=1, *, timeout=1000, timeout_char=0, read_buf_len=64)
@@ -352,21 +369,12 @@ STATIC mp_obj_t pyb_uart_init_helper(pyb_uart_obj_t *self, mp_uint_t n_args, con
     } else {
         mp_int_t parity = mp_obj_get_int(args.parity.u_obj);
         init->Parity = (parity & 1) ? UART_LCR_PARITY_ODD : UART_LCR_PARITY_EVEN;
-        bits += 1; // STs convention has bits including parity
     }
 
     // number of bits
-    static const mp_int_t parity_map[] ={
-    		-1, -1, -1, -1, -1,
-			UART_LCR_WLEN5,
-			UART_LCR_WLEN6,
-			UART_LCR_WLEN7,
-			UART_LCR_WLEN8,
-    };
-    if (bits >= 0 && bits < MP_ARRAY_SIZE(parity_map) && parity_map[bits] != -1) {
-        init->WordLength = parity_map[bits];
-    } else {
-        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "unsupported combination of bits and parity"));
+    init->WordLength = nbits_to_config(bits);
+    if (init->WordLength == -1) {
+        nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "unsupported combination of bits"));
     }
 
     // stop bits
@@ -521,7 +529,6 @@ STATIC mp_obj_t pyb_uart_writechar(mp_obj_t self_in, mp_obj_t char_in) {
     // write the character
     HAL_StatusTypeDef status;
     if (uart_tx_wait(self, self->timeout)) {
-        Chip_UART_SendByte(self->uart.Instance, data);
         status = uart_tx_data(self, (uint8_t*)&data, 1);
     } else {
         status = HAL_TIMEOUT;
