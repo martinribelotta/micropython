@@ -70,6 +70,42 @@ STM_SRC_C = $(addprefix stmhal/,\
 	)
 	
 LIB_C_SRC = $(addprefix lib/,\
+	libc/string0.c \
+	libm/math.c \
+	libm/asinfacosf.c \
+	libm/atanf.c \
+	libm/atan2f.c \
+	libm/fmodf.c \
+	libm/roundf.c \
+	libm/log1pf.c \
+	libm/acoshf.c \
+	libm/asinhf.c \
+	libm/atanhf.c \
+	libm/kf_rem_pio2.c \
+	libm/kf_sin.c \
+	libm/kf_cos.c \
+	libm/kf_tan.c \
+	libm/ef_rem_pio2.c \
+	libm/erf_lgamma.c \
+	libm/sf_sin.c \
+	libm/sf_cos.c \
+	libm/sf_tan.c \
+	libm/sf_frexp.c \
+	libm/sf_modf.c \
+	libm/sf_ldexp.c \
+	libm/sf_erf.c \
+	libm/wf_lgamma.c \
+	libm/wf_tgamma.c \
+	fatfs/ff.c \
+	fatfs/option/ccsbcs.c \
+	mp-readline/readline.c \
+	netutils/netutils.c \
+	timeutils/timeutils.c \
+	utils/pyexec.c \
+	utils/printf.c \
+	)
+
+#$(addprefix lib/,\
 	fatfs/ff.c \
 	fatfs/option/ccsbcs.c \
 	mp-readline/readline.c \
@@ -79,15 +115,12 @@ LIB_C_SRC = $(addprefix lib/,\
 
 SRC_C = \
 	main.c \
-	sysinit.c \
-	system.c \
 	help.c \
 	fatfs_port.c \
 	lpc43_it.c \
 	lpc43_flash.c \
 	lpc43_storage.c \
 	lpc43xx_mphal.c \
-	cr_startup_lpc43xx.c \
 	$(LIB_SRC_C) \
 	$(STM_SRC_C) \
 	$(MOD_SRC_C) \
