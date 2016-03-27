@@ -176,6 +176,8 @@ typedef void (*p_msDelay_func_t)(uint32_t);
 #define DEBUGIN() (int) EOF
 #endif /* defined(DEBUG_ENABLE) */
 
+int usb_init(void);
+
 /**
  * @}
  */
