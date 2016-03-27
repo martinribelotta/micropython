@@ -80,6 +80,8 @@ extern "C" {
 #define USE_RMII
 #define USE_PHY_MICREL
 
+/* USB usage for console */
+#define USE_USB0
 
 #define I2CDEV_UDA1380_ADDR     (0x34 >> 1)
 #define UDA1380_I2C_BUS          I2C0

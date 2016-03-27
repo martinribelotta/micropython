@@ -101,9 +101,8 @@ extern "C" {
 #define BOARD_GPIO_PULLUP		1
 #define BOARD_GPIO_PULLDOWN		2
 
-
-
-
+/* USB usage for console */
+#define USE_USB0
 
 /* Build for RMII interface */
 #define USE_RMII

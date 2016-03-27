@@ -23,9 +23,15 @@
 
 static char *stack_top;
 
+#if defined(USE_USB0) || defined(USE_USB1)
+#define HEAP_START ((uint8_t*) 0x20002000)
+#define HEAP_SIZE  (64*1024-0x2000)
+#define HEAP_END   (HEAP_START + HEAP_SIZE)
+#else
 #define HEAP_START ((uint8_t*) 0x20000000)
 #define HEAP_SIZE  (64*1024)
 #define HEAP_END   (HEAP_START + HEAP_SIZE)
+#endif
 
 fs_user_mount_t fs_user_mount_flash;
 
@@ -155,6 +161,10 @@ soft_reset:
     //extint_init0();
     //timer_init0();
     uart_init0();
+
+#if defined(USE_USB0) || defined(USE_USB1)
+    usb_init();
+#endif
 
     // Define MICROPY_HW_UART_REPL to be PYB_UART_6 and define
     // MICROPY_HW_UART_REPL_BAUD in your mpconfigboard.h file if you want a
