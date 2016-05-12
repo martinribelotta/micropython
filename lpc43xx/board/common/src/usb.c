@@ -88,6 +88,8 @@ USB_INTERFACE_DESCRIPTOR *find_IntfDesc(const uint8_t *pDesc, uint32_t intfClass
 	return pIntfDesc;
 }
 
+static uint8_t usb_mem_stack[0x2000] __attribute__((aligned (4096)));
+
 int usb_init(void)
 {
 	USBD_API_INIT_PARAM_T usb_param;
@@ -105,8 +107,8 @@ int usb_init(void)
 	memset((void *) &usb_param, 0, sizeof(USBD_API_INIT_PARAM_T));
 	usb_param.usb_reg_base = LPC_USB_BASE;
 	usb_param.max_num_ep = 4;
-	usb_param.mem_base = USB_STACK_MEM_BASE;
-	usb_param.mem_size = USB_STACK_MEM_SIZE;
+	usb_param.mem_base = (uint32_t) usb_mem_stack; // USB_STACK_MEM_BASE;
+	usb_param.mem_size = sizeof(usb_mem_stack); // USB_STACK_MEM_SIZE;
 
 	/* Set the USB descriptors */
 	desc.device_desc = (uint8_t *) USB_DeviceDescriptor;

@@ -73,8 +73,9 @@ int mp_hal_stdin_rx_chr(void) {
     for (;;) {
 #if defined(USE_USB0) || defined(USE_USB1)
 		uint8_t c;
-		if (vcom_bread(&c, 1) != 0)
-			return c;
+	    if (vcom_connected())
+	    	if (vcom_bread(&c, 1) != 0)
+	    		return c;
 #endif
         if (MP_STATE_PORT(pyb_stdio_uart) != NULL && uart_rx_any(MP_STATE_PORT(pyb_stdio_uart))) {
             return uart_rx_char(MP_STATE_PORT(pyb_stdio_uart));
@@ -88,11 +89,11 @@ void mp_hal_stdout_tx_strn(const char *str, size_t len) {
         uart_tx_strn(MP_STATE_PORT(pyb_stdio_uart), str, len);
     }
 #if defined(USE_USB0) || defined(USE_USB1)
-    while (len) {
-    	uint32_t n = vcom_write((uint8_t*) str, len);
-    	str += n;
-    	len -= n;
-    }
+	while (vcom_connected() && len) {
+		uint32_t n = vcom_write((uint8_t*) str, len);
+		str += n;
+		len -= n;
+	}
 #endif
 }
 
@@ -100,10 +101,10 @@ void vcom_tx_strn_cooked(const char *str, uint len) {
     for (const char *top = str + len; str < top; str++) {
         if (*str == '\n') {
         	uint8_t c = '\r';
-            while (vcom_write(&c, 1) == 0)
+            while (vcom_connected() && vcom_write(&c, 1) == 0)
             	__WFI();
         }
-        while (vcom_write((uint8_t*) str, 1) == 0)
+        while (vcom_connected() && vcom_write((uint8_t*) str, 1) == 0)
         	__WFI();
     }
 }
@@ -114,7 +115,8 @@ void mp_hal_stdout_tx_strn_cooked(const char *str, size_t len) {
         uart_tx_strn_cooked(MP_STATE_PORT(pyb_stdio_uart), str, len);
     }
 #if defined(USE_USB0) || defined(USE_USB1)
-    vcom_tx_strn_cooked(str, len);
+    if (vcom_connected())
+    	vcom_tx_strn_cooked(str, len);
 #endif
 }
 

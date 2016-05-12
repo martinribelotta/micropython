@@ -23,7 +23,7 @@
 
 static char *stack_top;
 
-#if defined(USE_USB0) || defined(USE_USB1)
+#if 0 && (defined(USE_USB0) || defined(USE_USB1))
 #define HEAP_START ((uint8_t*) 0x20002000)
 #define HEAP_SIZE  (64*1024-0x2000)
 #define HEAP_END   (HEAP_START + HEAP_SIZE)
