@@ -80,12 +80,14 @@ extern "C"
 #define USB_CDC_OUT_EP          0x01
 #define USB_CDC_INT_EP          0x83
 
+#if 0
 /* On LPC18xx/43xx the USB controller requires endpoint queue heads to start on
    a 4KB aligned memory. Hence the mem_base value passed to USB stack init should
    be 4KB aligned. The following manifest constants are used to define this memory.
  */
 #define USB_STACK_MEM_BASE      0x20000000
 #define USB_STACK_MEM_SIZE      0x00002000
+#endif
 
 /* USB descriptor arrays defined *_desc.c file */
 extern const uint8_t USB_DeviceDescriptor[];
