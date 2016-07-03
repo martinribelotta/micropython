@@ -3,7 +3,7 @@ include ../py/mkenv.mk
 BOARD ?= edu_ciaa
 
 # qstr definitions (must come before including py.mk)
-QSTR_DEFS = qstrdefsport.h
+QSTR_DEFS = qstrdefsport.h $(BUILD)/pins_qstr.h
 
 # include py core make definitions
 include ../py/py.mk
@@ -42,9 +42,9 @@ MOD_SRC_C = $(addprefix mods/,\
 	modpybrtc.c \
 	modpybuart.c \
 	modutime.c \
+	modpybpin.c \
 	)
 	# \
-	modpybpin.c \
 	modpybextint.c \
 	modpybadc.c \
 	modpybdac.c \
@@ -130,9 +130,32 @@ SRC_C = \
 	$(wildcard board/$(BOARD)/src/*.c) \
 	$(wildcard board/common/src/*.c)
 
+MAKE_PINS = board/make-pins.py
+BOARD_PINS = board/$(BOARD)/pins.csv
+AF_FILE = board/lpc43xx_af.csv
+PREFIX_FILE = board/lpc43xx_prefix.c
+GEN_PINS_SRC = $(BUILD)/pins.c
+GEN_PINS_HDR = $(HEADER_BUILD)/pins.h
+GEN_PINS_QSTR = $(BUILD)/pins_qstr.h
+
+# Making OBJ use an order-only dependency on the generated pins.h file
+# has the side effect of making the pins.h file before we actually compile
+# any of the objects. The normal dependency generation will deal with the
+# case when pins.h is modified. But when it doesn't exist, we don't know
+# which source files might need it.
+$(OBJ): | $(GEN_PINS_HDR)
+
+# Call make-pins.py to generate both pins_gen.c and pins.h
+$(GEN_PINS_SRC) $(GEN_PINS_HDR) $(GEN_PINS_QSTR): $(BOARD_PINS) $(MAKE_PINS) $(AF_FILE) $(PREFIX_FILE) | $(HEADER_BUILD)
+	$(ECHO) "Create $@"
+	$(Q)$(PYTHON) $(MAKE_PINS) --board $(BOARD_PINS) --af $(AF_FILE) --prefix $(PREFIX_FILE) --hdr $(GEN_PINS_HDR) --qstr $(GEN_PINS_QSTR) > $(GEN_PINS_SRC)
+
+$(BUILD)/pins.o: $(BUILD)/pins.c
+	$(call compile_c)
+
 -include board/$(BOARD)/board.mk
 
-OBJ = $(PY_O) $(addprefix $(BUILD)/, $(SRC_C:.c=.o) $(SRC_S:.s=.o))
+OBJ = $(PY_O) $(addprefix $(BUILD)/, $(SRC_C:.c=.o) $(SRC_S:.s=.o)) $(BUILD)/pins.o
 
 all: $(BUILD)/firmware.elf
 
