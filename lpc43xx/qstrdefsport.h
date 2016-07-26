@@ -114,9 +114,12 @@ Q(execfile)
 
 Q(readonly)
 Q(mkfs)
+Q(mount)
+Q(umount)
 Q(readblocks)
 Q(writeblocks)
 Q(flush)
+Q(buffer)
 
 Q(ExtInt)
 Q(pin)
