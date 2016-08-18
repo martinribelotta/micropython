@@ -4,7 +4,7 @@
 
 #include "lib/fatfs/ff.h"
 #include "board.h"
-#include "ciaanxp_mphal.h"
+#include MICROPY_HAL_H
 
 #define ACK	0x06
 #define NACK	0x15

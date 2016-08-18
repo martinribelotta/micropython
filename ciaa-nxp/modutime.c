@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <ciaa_mphal.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -36,7 +37,6 @@
 #include "timeutils.h"
 
 #include "modpyb.h"
-#include "ciaanxp_mphal.h"
 
 
 /// \function time()

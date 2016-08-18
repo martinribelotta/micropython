@@ -24,9 +24,18 @@
 static char *stack_top;
 //static __DATA(RAM2) char heap[32*1024];
 
+#ifdef CHIP_LPC5410X
+static __DATA(RAM2) uint8_t __mpy_heap[32*1024] __attribute__((aligned (16)));
+#define HEAP_START (__mpy_heap)
+#define HEAP_SIZE  (sizeof(__mpy_heap))
+#define HEAP_END   (HEAP_START + HEAP_SIZE)
+#elif defined(CHIP_LPC43XX)
 #define HEAP_START ((uint8_t*) 0x20000000)
 #define HEAP_SIZE  (64*1024)
 #define HEAP_END   (HEAP_START + HEAP_SIZE)
+#else
+#error Not recognized chip
+#endif
 
 static FATFS fatfs0;
 

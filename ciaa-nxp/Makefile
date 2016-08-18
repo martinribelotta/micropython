@@ -1,5 +1,12 @@
 include ../py/mkenv.mk
 
+PORT?=ciaa_edu_4337
+
+include port/$(PORT)/port.mk
+
+PORT_LD = port/$(PORT)/linker.ld
+OOCD_SCRIPT=port/$(PORT)/oocd.cfg
+
 # qstr definitions (must come before including py.mk)
 QSTR_DEFS = qstrdefsport.h
 
@@ -15,7 +22,9 @@ INC += -I../stmhal
 INC += -I../teensy
 INC += -I../lib/mp-readline
 INC += -I../lib/timeutils
-INC += -Iboard_ciaa_edu_4337/inc/ -Ilpc_chip_43xx/inc/
+INC += $(foreach d, $(PORT_M), -Iport/$(PORT)/$(d)/inc)
+INC += -Iport/$(PORT)/modules
+INC += -Iponchos/inc
 INC += -I$(BUILD)
 
 COPT += -DCORE_M4 -D__USE_LPCOPEN -D__USE_NEWLIB
@@ -31,39 +40,21 @@ else
 CFLAGS += -Os -DNDEBUG
 endif
 
-LDFLAGS = $(ARCH_FLAGS) -nostdlib -T ciaa_lpc4337.ld -Wl,-Map=$@.map -Wl,--cref
-LIBS =
+LDFLAGS = $(ARCH_FLAGS) -nostdlib -T $(PORT_LD) -Wl,-Map=$@.map -Wl,--cref
+LIBS = $(PORT_EXTRA_LIBS)
+
+SRC_M = \
+	moduos.c \
+	modutime.c \
+	$(foreach m, $(PORT_MODULES), port/$(PORT)/modules/$(m))
 
 SRC_C = \
 	main.c \
-	sysinit.c \
 	system.c \
-	cr_startup_lpc43xx.c \
-	ciaanxp_mphal.c \
 	ciaa_help.c \
 	bootSys.c  \
-	lpc43_diskio.c \
-	lpc43_flash.c \
-	lpc43_storage.c \
+	diskio.c \
 	ffconf.c \
-	moduos.c \
-	modutime.c \
-	modpyb.c \
-	modpybled.c \
-	modpybswitch.c \
-	modpybuart.c \
-	modpybpin.c \
-	modpybextint.c \
-	modpybdac.c \
-	modpybtimer.c \
-	modpybpwm.c \
-	modpybadc.c \
-	modpybkeyboard.c \
-	modpyblcd44780u.c \
-	modpybeeprom.c \
-	modpybspi.c \
-	modpybrtc.c \
-	modpybi2c.c \
 	lib/fatfs/ff.c \
 	lib/fatfs/option/ccsbcs.c \
 	lib/mp-readline/readline.c \
@@ -75,9 +66,10 @@ SRC_C = \
 	stmhal/lexerfatfs.c \
 	stmhal/pybstdio.c \
 	stmhal/bufhelper.c \
-	$(wildcard lpc_chip_43xx/src/*.c) \
-	$(wildcard board_ciaa_edu_4337/src/*.c) \
-	$(wildcard board_ciaa_edu_4337/src/ponchos/*.c)
+	$(SRC_M) \
+	$(foreach m, $(PORT_M), $(wildcard port/$(PORT)/$(m)/src/*.c)) \
+	$(wildcard ponchos/src/*.c) \
+	$(PORT_EXTRA_SRC)
 
 SRC_S = \
 #	startup_stm32f40xx.s \
@@ -116,35 +108,34 @@ $(BUILD)/firmware.bin: $(BUILD)/firmware.elf
 PHONY: debug openocd download erase erase_fs
 
 download: $(BUILD)/firmware.bin
-	@openocd -f ciaa-nxp.cfg \
+	@openocd -f $(OOCD_SCRIPT) \
 		-c "init" \
 		-c "halt 0" \
-		-c "flash write_image erase unlock $^ 0x1A000000 bin" \
+		-c $(PORT_FLASH_WRITE) \
 		-c "reset run" \
 		-c "shutdown"
 
-fsdownload: $(BUILD)/fs.bin
-	@openocd -f ciaa-nxp.cfg \
-		-c "init" \
-		-c "halt 0" \
-		-c "flash write_image erase unlock $^ 0x1B000000 bin" \
-		-c "reset run" \
-		-c "shutdown"
+#fsdownload: $(BUILD)/fs.bin
+#	@openocd -f $(OOCD_SCRIPT) \
+#		-c "init" \
+#		-c "halt 0" \
+#		-c "flash write_image erase unlock $^ 0x1B000000 bin" \
+#		-c "reset run" \
+#		-c "shutdown"
 
 erase:
-	@openocd -f ciaa-nxp.cfg \
+	@openocd -f $(OOCD_SCRIPT) \
 		-c "init" -c "halt 0" -c "flash erase_sector 0 0 last" -c "shutdown"
 
 erase_fs:
-	@openocd -f ciaa-nxp.cfg \
+	@openocd -f $(OOCD_SCRIPT) \
 		-c "init" -c "halt 0" -c "flash erase_sector 1 0 last" -c "shutdown"
 
 openocd:
-	@openocd -f ciaa-nxp.cfg
+	@openocd -f $(OOCD_SCRIPT)
 
 debug: $(BUILD)/firmware.elf
 	$(CROSS_COMPILE)gdb $(BUILD)/firmware.elf -ex "target remote :3333" -ex "mon reset halt" -ex "load"
-
 
 test: CFLAGS += -DTESTING
 

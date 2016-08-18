@@ -151,4 +151,4 @@ extern const struct _mp_obj_module_t mp_module_utime;
 	/* for user-mountable block device */ \
 	struct _fs_user_mount_t *fs_user_mount; \
 
-#define MICROPY_HAL_H "ciaanxp_mphal.h"
+#define MICROPY_HAL_H "ciaa_mphal.h"
