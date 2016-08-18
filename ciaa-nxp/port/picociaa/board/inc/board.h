@@ -104,7 +104,7 @@ extern "C" {
 /** External clock rate on the CLKIN pin in Hz for this board. If not used,
     set this to 0. Otherwise, set it to the exact rate in Hz this pin is
     being driven at. */
-#define BOARD_EXTCLKINRATE      (0)
+#define BOARD_EXTCLKINRATE      (1)
 
 /** Set the BOARD_USECLKINSRC definition to (1) to use the external clock
     input pin as the PLL source. The BOARD_ECTCLKINRATE definition must
