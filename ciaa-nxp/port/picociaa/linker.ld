@@ -3,7 +3,7 @@ MEMORY
 {
   /* Define each memory region */
   MFlash512 (rx) : ORIGIN = 0x0, LENGTH = 0x80000 /* 512K bytes (alias Flash) */  
-  Ram0_64 (rwx) : ORIGIN = 0x2000000, LENGTH = 0x10000 /* 64K bytes (alias RAM) */  
+  Ram0_64 (rwx) : ORIGIN = 0x2000000, LENGTH = 0xffe0 /* 64K - 32 bytes (alias RAM) */  
   Ram1_32 (rwx) : ORIGIN = 0x2010000, LENGTH = 0x8000 /* 32K bytes (alias RAM2) */  
   Ram2_8 (rwx) : ORIGIN = 0x3400000, LENGTH = 0x2000 /* 8K bytes (alias RAM3) */  
 }
@@ -16,7 +16,7 @@ MEMORY
   __base_Ram0_64 = 0x2000000  ; /* Ram0_64 */  
   __base_RAM = 0x2000000 ; /* RAM */  
   __top_Ram0_64 = 0x2000000 + 0x10000 ; /* 64K bytes */  
-  __top_RAM = 0x2000000 + 0x10000 ; /* 64K bytes */  
+  __top_RAM = 0x2000000 + 0x10000 - 32 ; /* 64K bytes */  
   __base_Ram1_32 = 0x2010000  ; /* Ram1_32 */  
   __base_RAM2 = 0x2010000 ; /* RAM2 */  
   __top_Ram1_32 = 0x2010000 + 0x8000 ; /* 32K bytes */  
@@ -232,7 +232,7 @@ SECTIONS
     } > Ram0_64
 
     PROVIDE(_pvHeapStart = DEFINED(__user_heap_base) ? __user_heap_base : .);
-    PROVIDE(_vStackTop = DEFINED(__user_stack_top) ? __user_stack_top : __top_Ram0_64 - 32);
+    PROVIDE(_vStackTop = DEFINED(__user_stack_top) ? __user_stack_top : __top_Ram0_64);
 
     /* ## Create checksum value (used in startup) ## */
     PROVIDE(__valid_user_code_checksum = 0 - 

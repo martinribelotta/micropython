@@ -31,7 +31,7 @@
 
 #include "storage.h"
 #include "py/obj.h"
-#include "mphalport.h"
+#include "py/mphal.h"
 
 #define FLASH_ADDR_BASE        (0x00000000)
 #define FLASH_PAGE_SIZE        (256)
@@ -61,18 +61,21 @@ static const char *flash_msg[] = {
 
 static void flash_abort(const char *msg) {
 	(void) msg;
+	__enable_irq();
+	mp_hal_stdout_tx_str(msg);
 	while(1) { }
 }
 
-static volatile unsigned int flash_inited = 0;
-
 void storage_init(void) {
+#if 0
+	static volatile unsigned int flash_inited = 0;
 	if (flash_inited == 0) {
 		unsigned int command[5] = { 49, 0, 0, 0, 0 };
 		unsigned int result[5];
 		iap_entry(command, result);
 		flash_inited = 1;
 	}
+#endif
 }
 
 void storage_flush(void) {
@@ -114,7 +117,7 @@ static void build_partition(uint8_t *buf, int boot, int type, uint32_t start_blo
     buf[15] = num_blocks >> 24;
 }
 
-static void my_memcpy(uint8_t *dst, uint8_t *src, size_t len) {
+static void my_memcpy(uint32_t *dst, const uint32_t *src, size_t len) {
 	while(len--) {
 		*dst++ = *src++;
 	}
@@ -140,10 +143,24 @@ bool storage_read_block(uint8_t *dest, uint32_t block) {
         return true;
 
     } else {
-        void *src = (void*) (FLASH_DISK_BASE + FLASH_BLOCK_SIZE * block);
-        my_memcpy(dest, src, FLASH_BLOCK_SIZE);
+        const uint32_t *src = (const uint32_t*) (FLASH_DISK_BASE + FLASH_BLOCK_SIZE * block);
+        my_memcpy((uint32_t*) dest, src, FLASH_BLOCK_SIZE / sizeof(uint32_t));
         return true;
     }
+}
+
+static uint32_t aliged_buffer[FLASH_BLOCK_SIZE / sizeof(uint32_t)];
+
+static int check_blank(uint32_t address, uint32_t bytes)
+{
+	uint32_t *ptr = ((uint32_t *) address);
+	uint32_t count = bytes / 4;
+	uint32_t i;
+	for (i=0; i<count; i++) {
+		if (*ptr++ != 0xFFFFFFFF)
+			return IAP_SECTOR_NOT_BLANK;
+	}
+	return IAP_CMD_SUCCESS;
 }
 
 bool storage_write_block(const uint8_t *src, uint32_t block) {
@@ -164,13 +181,26 @@ bool storage_write_block(const uint8_t *src, uint32_t block) {
 		return false; \
 	} \
 } while(0)
-
+    	my_memcpy(aliged_buffer, (const uint32_t*) src, FLASH_BLOCK_SIZE / sizeof(uint32_t));
         __disable_irq();
+    	if (1) {
+    		int retry = 3;
+			do {
+				uint32_t e;
+		    	GUARD(Chip_IAP_PreSectorForReadWrite(sector, sector));
+				GUARD(Chip_IAP_ErasePage(page_start, page_end));
+				e = check_blank(flash_dst, FLASH_BLOCK_SIZE);
+				if (e == IAP_CMD_SUCCESS) {
+					break;
+				} else {
+					mp_hal_stdout_tx_str(flash_msg[e]);
+					mp_hal_stdout_tx_str("\r\n");
+				}
+			} while(retry--);
+    	}
     	GUARD(Chip_IAP_PreSectorForReadWrite(sector, sector));
-    	GUARD(Chip_IAP_ErasePage(page_start, page_end));
-    	GUARD(Chip_IAP_PreSectorForReadWrite(sector, sector));
-    	GUARD(Chip_IAP_CopyRamToFlash(flash_dst, (uint32_t*) src, FLASH_BLOCK_SIZE));
-    	// GUARD(Chip_IAP_Compare(flash_dst, (uint32_t) src, FLASH_BLOCK_SIZE));
+    	GUARD(Chip_IAP_CopyRamToFlash(flash_dst, aliged_buffer, FLASH_BLOCK_SIZE));
+    	GUARD(Chip_IAP_Compare(flash_dst, (uint32_t) aliged_buffer, FLASH_BLOCK_SIZE));
         __enable_irq();
 
         return true;

@@ -25,7 +25,7 @@ static char *stack_top;
 //static __DATA(RAM2) char heap[32*1024];
 
 #ifdef CHIP_LPC5410X
-static __DATA(RAM2) uint8_t __mpy_heap[32*1024] __attribute__((aligned (16)));
+static uint8_t __mpy_heap[56*1024] __attribute__((aligned (16)));
 #define HEAP_START (__mpy_heap)
 #define HEAP_SIZE  (sizeof(__mpy_heap))
 #define HEAP_END   (HEAP_START + HEAP_SIZE)
@@ -55,14 +55,17 @@ static const char fresh_readme_txt[] =
 void init_flash_fs(uint reset_mode) {
     // try to mount the flash
     FRESULT res = f_mount(&fatfs0, "/flash", 1);
-
+    mp_hal_stdout_tx_str("Mouting /flash...\r\n");
     if (reset_mode == 3 || res == FR_NO_FILESYSTEM) {
         // no filesystem, or asked to reset it, so create a fresh one
+        mp_hal_stdout_tx_str("No filesystem. mkfs.fat /flash...\r\n");
 
         res = f_mkfs("/flash", 0, 0);
         if (res == FR_OK) {
+            mp_hal_stdout_tx_str("FAT on /flash created\r\n");
             // success creating fresh LFS
         } else {
+        	mp_hal_stdout_tx_str("mkfs fail\n");
             __BKPT(0);
         }
 
@@ -71,9 +74,15 @@ void init_flash_fs(uint reset_mode) {
 
         // create empty main.py
         FIL fp;
-        f_open(&fp, "/flash/main.py", FA_WRITE | FA_CREATE_ALWAYS);
+#define CHECK(op) do { \
+		int r = op; \
+		if (r != FR_OK) { \
+			mp_hal_stdout_tx_str("Op: " #op " fail\r\n"); \
+		} \
+	} while(0)
+        CHECK(f_open(&fp, "/flash/main.py", FA_WRITE | FA_CREATE_ALWAYS));
         UINT n;
-        f_write(&fp, fresh_main_py, sizeof(fresh_main_py) - 1 /* don't count null terminator */, &n);
+        CHECK(f_write(&fp, fresh_main_py, sizeof(fresh_main_py) - 1 /* don't count null terminator */, &n));
         // TODO check we could write n bytes
         f_close(&fp);
 
@@ -81,7 +90,9 @@ void init_flash_fs(uint reset_mode) {
         mp_hal_milli_delay(200);
     } else if (res == FR_OK) {
         // mount sucessful
+    	mp_hal_stdout_tx_str("FAT on /flash mounted ok\r\n");
     } else {
+    	mp_hal_stdout_tx_str("/flash can not mounted\r\n");
         __BKPT(0);
     }
 
@@ -123,7 +134,7 @@ soft_reset:
     #endif
 
 	// check new script from IDE
-	boot();
+	//boot();
 	//__________________________
 
 

@@ -105,10 +105,13 @@ $(BUILD)/firmware.elf: $(OBJ)
 $(BUILD)/firmware.bin: $(BUILD)/firmware.elf
 	$(Q)$(CROSS_COMPILE)objcopy -v -O binary $< $@
 
+$(BUILD)/firmware.hex: $(BUILD)/firmware.elf
+	$(Q)$(CROSS_COMPILE)objcopy -O ihex $< $@;
+
 PHONY: debug openocd download erase erase_fs
 
 download: $(BUILD)/firmware.bin
-	@openocd -f $(OOCD_SCRIPT) \
+	$(Q)openocd -f $(OOCD_SCRIPT) \
 		-c "init" \
 		-c "halt 0" \
 		-c $(PORT_FLASH_WRITE) \
@@ -124,18 +127,18 @@ download: $(BUILD)/firmware.bin
 #		-c "shutdown"
 
 erase:
-	@openocd -f $(OOCD_SCRIPT) \
+	$(Q)openocd -f $(OOCD_SCRIPT) \
 		-c "init" -c "halt 0" -c "flash erase_sector 0 0 last" -c "shutdown"
 
 erase_fs:
-	@openocd -f $(OOCD_SCRIPT) \
+	$(Q)openocd -f $(OOCD_SCRIPT) \
 		-c "init" -c "halt 0" -c "flash erase_sector 1 0 last" -c "shutdown"
 
 openocd:
-	@openocd -f $(OOCD_SCRIPT)
+	$(Q)openocd -f $(OOCD_SCRIPT)
 
 debug: $(BUILD)/firmware.elf
-	$(CROSS_COMPILE)gdb $(BUILD)/firmware.elf -ex "target remote :3333" -ex "mon reset halt" -ex "load"
+	$(Q)$(CROSS_COMPILE)gdb $(BUILD)/firmware.elf -ex "target remote :3333" -ex "mon reset halt" -ex "load"
 
 test: CFLAGS += -DTESTING
 
