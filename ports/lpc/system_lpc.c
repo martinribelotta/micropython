@@ -1,4 +1,9 @@
-#include "startup.h"
+#include <stdint.h>
+
+extern void Reset_Chip(void);
+extern void fpuInit(void);
+extern void Board_SystemInit(void);
+extern int main(int, char **);
 
 extern uint32_t _estack, _sidata, _sdata, _edata, _sbss, _ebss;
 
@@ -27,7 +32,7 @@ void Reset_Handler(void) {
     *((volatile uint32_t*)0xe000ed14) |= 1 << 9;
 
     // now that we have a basic system up and running we can call main
-    main(0, NULL);
+    main(0, 0);
 
     // we must not return
     for (;;) {
