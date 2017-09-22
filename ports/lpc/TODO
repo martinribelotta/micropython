@@ -1,2 +1,4 @@
-Linker scripts for each board/chip
-Makefile
+* Linker scripts for each board/chip
+* Makefile
+* Add lpc port to travis
+* Add a nice README.md for the port
