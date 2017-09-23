@@ -2,6 +2,8 @@ include ../../py/mkenv.mk
 
 BOARD=lpc_board_hitex_eva_4350
 
+MPY_CROSS=$(TOP)/mpy-cross/mpy-cross
+
 -include boards/$(BOARD)/board.mk
 
 # qstr definitions (must come before including py.mk)
@@ -54,9 +56,13 @@ OBJ = $(PY_O) $(addprefix $(BUILD)/, $(SRC_C:.c=.o))
 
 all: $(BUILD)/firmware.dfu
 
-$(BUILD)/frozentest.mpy: frozentest.py
+$(MPY_CROSS):
+	$(ECHO) "MISC creating mpy cross"
+	$(Q)$(MAKE) -C $(dir $@)
+
+$(BUILD)/frozentest.mpy: frozentest.py $(MPY_CROSS)
 	$(ECHO) "MISC compile bytecode of $<"
-	$(Q)$(TOP)/mpy-cross/mpy-cross $< -o $@
+	$(Q)$(MPY_CROSS) $< -o $@
 
 $(BUILD)/_frozen_mpy.c: $(BUILD)/frozentest.mpy $(BUILD)/genhdr/qstrdefs.generated.h
 	$(ECHO) "MISC freezing bytecode"
