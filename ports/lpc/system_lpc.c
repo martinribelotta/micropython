@@ -1,16 +1,28 @@
 #include <stdint.h>
 
-extern void Reset_Chip(void);
-extern void fpuInit(void);
-extern void Board_SystemInit(void);
-extern int main(void);
+#include "fpu_init.h"
+#include "board.h"
 
 extern uint32_t _estack, _sidata, _sdata, _edata, _sbss, _ebss;
 
 void Reset_Handler(void) __attribute__((naked));
 void Reset_Handler(void) {
 
-    Reset_Chip();
+    // The following block of code manually resets as
+    // much of the peripheral set of the LPC43 as possible. This is
+    // done because the LPC43 does not provide a means of triggering
+    // a full system reset under debugger control, which can cause
+    // problems in certain circumstances when debugging.
+    //
+
+    // Disable interrupts
+    __asm volatile ("cpsid i");
+
+    Chip_RGU_TriggerResetAll();
+    NVIC_ClearAll();
+
+    // Reenable interrupts
+    __asm volatile ("cpsie i");
 
     #if defined(__FPU_PRESENT) && __FPU_PRESENT == 1
     fpuInit();
@@ -32,6 +44,7 @@ void Reset_Handler(void) {
     *((volatile uint32_t*)0xe000ed14) |= 1 << 9;
 
     // now that we have a basic system up and running we can call main
+    int main(void);
     main();
 
     // we must not return
