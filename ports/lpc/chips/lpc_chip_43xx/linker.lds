@@ -1,5 +1,5 @@
 /*
-    GNU linker script for STM32F405
+    GNU linker script for LPC43xx
 */
 
 INCLUDE memory.lds
