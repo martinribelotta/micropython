@@ -16,13 +16,13 @@ void Reset_Handler(void) {
     //
 
     // Disable interrupts
-    __asm volatile ("cpsid i");
+    //__asm volatile ("cpsid i");
 
     Chip_RGU_TriggerResetAll();
     NVIC_ClearAll();
 
     // Reenable interrupts
-    __asm volatile ("cpsie i");
+    //__asm volatile ("cpsie i");
 
     #if defined(__FPU_PRESENT) && __FPU_PRESENT == 1
     fpuInit();
