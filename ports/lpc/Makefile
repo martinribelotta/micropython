@@ -51,24 +51,11 @@ SRC_C = \
 	lib/utils/stdout_helpers.c \
 	lib/utils/pyexec.c \
 	lib/libc/string0.c \
-	lib/mp-readline/readline.c \
-	$(BUILD)/_frozen_mpy.c
+	lib/mp-readline/readline.c
 
 OBJ = $(PY_O) $(addprefix $(BUILD)/, $(SRC_C:.c=.o))
 
 all: $(BUILD)/firmware.bin
-
-$(MPY_CROSS):
-	$(ECHO) "MISC creating mpy cross"
-	$(Q)$(MAKE) -C $(dir $@)
-
-$(BUILD)/frozentest.mpy: frozentest.py $(MPY_CROSS)
-	$(ECHO) "MISC compile bytecode of $<"
-	$(Q)$(MPY_CROSS) $< -o $@
-
-$(BUILD)/_frozen_mpy.c: $(BUILD)/frozentest.mpy $(BUILD)/genhdr/qstrdefs.generated.h
-	$(ECHO) "MISC freezing bytecode"
-	$(Q)$(TOP)/tools/mpy-tool.py -f -q $(BUILD)/genhdr/qstrdefs.preprocessed.h -mlongint-impl=none $< > $@
 
 $(BUILD)/firmware.elf: $(OBJ)
 	$(ECHO) "LINK $@"
