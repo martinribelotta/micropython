@@ -27,6 +27,8 @@
 #include "board.h"
 #include "string.h"
 
+#include <stdint.h>
+
 /** @ingroup BOARD_NGX_XPLORER_18304330
  * @{
  */
@@ -198,3 +200,15 @@ void Board_DAC_Init(LPC_DAC_T *pDAC)
 /**
  * @}
  */
+
+// FIXME
+uint64_t  __aeabi_uldivmod(uint64_t a, uint64_t b) {
+  if( b == 0 ) {
+    return 0;
+  }
+
+  while( a > b ) {
+    a -= b;
+  }
+  return a;
+}
