@@ -24,7 +24,7 @@ INC += -Ichips/$(CHIP)/inc
 
 DFU = $(TOP)/tools/dfu.py
 PYDFU = $(TOP)/tools/pydfu.py
-CFLAGS_CORTEX_M4 = -mthumb -mtune=cortex-m4 -mabi=aapcs-linux -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -Wdouble-promotion
+CFLAGS_CORTEX_M4 = -mthumb -mtune=cortex-m4 -mabi=aapcs -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -Wdouble-promotion
 CFLAGS = $(INC) -Wall -Werror -std=c99 -nostdlib $(CFLAGS_CORTEX_M4) $(COPT)
 LDFLAGS = -nostdlib -Lboards/$(BOARD)/lib -Lchips/$(CHIP) -T chips/$(CHIP)/linker.lds -Map=$@.map --cref --gc-sections
 
@@ -38,12 +38,11 @@ endif
 
 CFLAGS += $(BOARD_CFLAGS) $(CHIP_CFLAGS)
 
-LIBS =
+LIBS = $(shell $(CROSS_COMPILE)gcc $(CFLAGS_CORTEX_M4)  --print-libgcc-file-name)
 
 SRC_C = \
 	main.c \
 	mphalport.c \
-	system_lpc.c \
 	$(wildcard boards/$(BOARD)/src/*.c) \
 	$(wildcard chips/$(CHIP)/src/*.c) \
 	lib/utils/stdout_helpers.c \

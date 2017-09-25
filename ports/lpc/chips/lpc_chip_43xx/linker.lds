@@ -53,5 +53,8 @@ SECTIONS
         _ebss = .;         /* define a global symbol at bss end; used by startup code */
     } >RAM
 
-    .ARM.attributes 0 : { *(.ARM.attributes) }
+    /DISCARD/ : {
+        *(.ARM.attributes)
+        *(.ARM.exidx)
+    }
 }
