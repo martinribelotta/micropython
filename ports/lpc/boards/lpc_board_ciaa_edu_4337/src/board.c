@@ -53,8 +53,8 @@ static const io_port_t gpioLEDBits[] = {{0, 14}, {1, 11}, {1, 12}, {5, 0}, {5, 1
 
 void Board_UART_Init(LPC_USART_T *pUART)
 {
-   Chip_SCU_PinMuxSet(0x6, 4, (SCU_MODE_INACT | SCU_MODE_FUNC2));                  /* P6,4 : UART0_TXD */
-   Chip_SCU_PinMuxSet(0x2, 1, (SCU_MODE_INACT | SCU_MODE_INBUFF_EN | SCU_MODE_ZIF_DIS | SCU_MODE_FUNC1));/* P2.1 : UART0_RXD */
+   Chip_SCU_PinMuxSet(0x7, 1, (SCU_MODE_INACT | SCU_MODE_FUNC6));                  /* P7.1 : UART2_TXD */
+   Chip_SCU_PinMuxSet(0x7, 2, (SCU_MODE_INACT | SCU_MODE_INBUFF_EN | SCU_MODE_ZIF_DIS | SCU_MODE_FUNC6));/* P7.2 : UART2_RXD */
 }
 
 /* Initialize debug output via UART for board */
@@ -200,15 +200,3 @@ void Board_DAC_Init(LPC_DAC_T *pDAC)
 /**
  * @}
  */
-
-// FIXME
-uint64_t  __aeabi_uldivmod(uint64_t a, uint64_t b) {
-  if( b == 0 ) {
-    return 0;
-  }
-
-  while( a > b ) {
-    a -= b;
-  }
-  return a;
-}
