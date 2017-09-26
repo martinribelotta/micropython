@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "mpconfigboard.h"
 
 // options to control how MicroPython is built
 
@@ -74,9 +75,6 @@ typedef long mp_off_t;
 
 // We need to provide a declaration/definition of alloca()
 #include <alloca.h>
-
-#define MICROPY_HW_BOARD_NAME "lpc board"
-#define MICROPY_HW_MCU_NAME "lpc cpu"
 
 #ifdef __linux__
 #define MICROPY_MIN_USE_STDOUT (1)
