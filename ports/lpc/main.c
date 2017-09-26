@@ -31,20 +31,22 @@ static char *stack_top;
 static char heap[2048];
 
 int main(void) {
-    int stack_dummy;
-    stack_top = (char*)&stack_dummy;
+    while(1) {
+        int stack_dummy;
+        stack_top = (char*)&stack_dummy;
 
-    SystemCoreClockUpdate();
-    SysTick_Config(SystemCoreClock/1000);
-    Board_Init();
+        SystemCoreClockUpdate();
+        SysTick_Config(SystemCoreClock/1000);
+        Board_Init();
 
-    gc_init(heap, heap + sizeof(heap));
+        gc_init(heap, heap + sizeof(heap));
 
-    mp_init();
+        mp_init();
 
-    pyexec_friendly_repl();
+        pyexec_friendly_repl();
 
-    mp_deinit();
+        mp_deinit();
+    }
 
     return 0;
 }
