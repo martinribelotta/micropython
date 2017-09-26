@@ -1,6 +1,6 @@
 include ../../py/mkenv.mk
 
-BOARD=lpc_board_hitex_eva_4350
+BOARD=lpc_board_ciaa_edu_4337
 
 MPY_CROSS=$(TOP)/mpy-cross/mpy-cross
 
@@ -17,11 +17,14 @@ CROSS_COMPILE = arm-none-eabi-
 INC += -I.
 INC += -I$(TOP)
 INC += -I$(BUILD)
+INC += -Iboards/$(BOARD)
 INC += -Iboards/$(BOARD)/inc
 INC += -Ichips/$(CHIP)/inc
 
 -include chips/$(CHIP)/chip.mk
 
+OPENOCD = openocd
+OPENOCD_CONFIG = boards/$(BOARD)/openocd.cfg
 DFU = $(TOP)/tools/dfu.py
 PYDFU = $(TOP)/tools/pydfu.py
 CFLAGS_CORTEX_M4 = -mthumb -mtune=cortex-m4 -mabi=aapcs -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -Wdouble-promotion
@@ -53,7 +56,7 @@ SRC_C = \
 
 OBJ = $(PY_O) $(addprefix $(BUILD)/, $(SRC_C:.c=.o))
 
-all: $(BUILD)/firmware.dfu
+all: $(BUILD)/firmware.bin
 
 $(MPY_CROSS):
 	$(ECHO) "MISC creating mpy cross"
@@ -80,8 +83,12 @@ $(BUILD)/firmware.dfu: $(BUILD)/firmware.bin
 	$(Q)$(PYTHON) $(DFU) -b 0x08000000:$(BUILD)/firmware.bin $@
 
 deploy: $(BUILD)/firmware.dfu
-	$(ECHO) "Writing $< to the board"
+	$(ECHO) "Writing $< to the board via DFU"
 	$(Q)$(PYTHON) $(PYDFU) -u $<
+
+deploy-openocd: $(BUILD)/firmware.bin
+	$(ECHO) "Writing $< to the board via OpenOCD"
+	$(Q)$(OPENOCD) -f $(OPENOCD_CONFIG) -c "lpc_flash $<"
 
 # Run emulation build on a POSIX system with suitable terminal settings
 run:
