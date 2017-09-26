@@ -55,6 +55,6 @@ SECTIONS
 
     /DISCARD/ : {
         *(.ARM.attributes)
-        *(.ARM.exidx)
+        *(.ARM.exidx*)
     }
 }
