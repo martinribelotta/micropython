@@ -142,6 +142,10 @@ void Board_SetupClocking(void)
    /* Reset and enable 32Khz oscillator */
    LPC_CREG->CREG0 &= ~((1 << 3) | (1 << 2));
    LPC_CREG->CREG0 |= (1 << 1) | (1 << 0);
+
+   /* Wait until stable */
+   volatile unsigned int delay = 10000;
+   while (delay--);
 }
 
 /* Set up and initialize hardware prior to call to main */
