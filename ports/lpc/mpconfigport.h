@@ -1,10 +1,10 @@
 #include <stdint.h>
+#include "mpconfigboard.h"
 
 // options to control how MicroPython is built
 
 #define MICROPY_ENABLE_COMPILER     (1)
 #define MICROPY_QSTR_BYTES_IN_HASH  (1)
-#define MICROPY_QSTR_EXTRA_POOL     mp_qstr_frozen_const_pool
 #define MICROPY_ALLOC_PATH_MAX      (256)
 #define MICROPY_ALLOC_PARSE_CHUNK_INIT (16)
 #define MICROPY_EMIT_X64            (0)
@@ -46,7 +46,7 @@
 #define MICROPY_PY_IO               (1)
 #define MICROPY_PY_STRUCT           (1)
 #define MICROPY_PY_SYS              (0)
-#define MICROPY_MODULE_FROZEN_MPY   (1)
+#define MICROPY_MODULE_FROZEN_MPY   (0)
 #define MICROPY_CPYTHON_COMPAT      (0)
 #define MICROPY_LONGINT_IMPL        (MICROPY_LONGINT_IMPL_NONE)
 #define MICROPY_FLOAT_IMPL          (MICROPY_FLOAT_IMPL_NONE)
@@ -74,9 +74,6 @@ typedef long mp_off_t;
 
 // We need to provide a declaration/definition of alloca()
 #include <alloca.h>
-
-#define MICROPY_HW_BOARD_NAME "lpc board"
-#define MICROPY_HW_MCU_NAME "lpc cpu"
 
 #ifdef __linux__
 #define MICROPY_MIN_USE_STDOUT (1)
