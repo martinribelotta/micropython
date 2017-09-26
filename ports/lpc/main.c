@@ -31,10 +31,12 @@ static char *stack_top;
 static char heap[2048];
 
 int main(void) {
+
     while(1) {
         int stack_dummy;
         stack_top = (char*)&stack_dummy;
 
+        Board_SystemInit();
         SystemCoreClockUpdate();
         SysTick_Config(SystemCoreClock/1000);
         Board_Init();
