@@ -154,6 +154,7 @@ void Board_SystemInit(void)
    /* Setup system clocking and memory. This is done early to allow the
       application and tools to clear memory and use scatter loading to
       external memory. */
+   fpuInit();
    Board_SetupMuxing();
    Board_SetupClocking();
 }

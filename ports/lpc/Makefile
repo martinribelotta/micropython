@@ -28,7 +28,7 @@ OPENOCD_CONFIG = boards/$(BOARD)/openocd.cfg
 DFU = dfu-util
 DFUHDR = $(TOP)/tools/dfuheader.py
 CFLAGS_CORTEX_M4 = -mthumb -mtune=cortex-m4 -mabi=aapcs -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -Wdouble-promotion
-CFLAGS = $(INC) -Wall -Werror -std=c99 -nostdlib $(CFLAGS_CORTEX_M4) $(COPT)
+CFLAGS = $(INC) -Wall -Werror  -std=gnu99 -nostdlib $(CFLAGS_CORTEX_M4) $(COPT)
 LDFLAGS = -nostdlib -Lboards/$(BOARD) -Lchips/$(CHIP) -T chips/$(CHIP)/linker.lds -Map=$@.map --cref --gc-sections
 
 # Tune for Debugging or Optimization
@@ -43,6 +43,35 @@ CFLAGS += $(BOARD_CFLAGS) $(CHIP_CFLAGS)
 
 LIBS = $(shell $(CROSS_COMPILE)gcc $(CFLAGS_CORTEX_M4)  --print-libgcc-file-name)
 
+SRC_LIBM = $(addprefix lib/libm/,\
+	math.c \
+	thumb_vfp_sqrtf.c \
+	acoshf.c \
+	asinfacosf.c \
+	asinhf.c \
+	atan2f.c \
+	atanf.c \
+	atanhf.c \
+	ef_rem_pio2.c \
+	erf_lgamma.c \
+	fmodf.c \
+	kf_cos.c \
+	kf_rem_pio2.c \
+	kf_sin.c \
+	kf_tan.c \
+	log1pf.c \
+	nearbyintf.c \
+	sf_cos.c \
+	sf_erf.c \
+	sf_frexp.c \
+	sf_ldexp.c \
+	sf_modf.c \
+	sf_sin.c \
+	sf_tan.c \
+	wf_lgamma.c \
+	wf_tgamma.c \
+	)
+
 SRC_C = \
 	main.c \
 	mphalport.c \
@@ -51,7 +80,8 @@ SRC_C = \
 	lib/utils/stdout_helpers.c \
 	lib/utils/pyexec.c \
 	lib/libc/string0.c \
-	lib/mp-readline/readline.c
+	lib/mp-readline/readline.c \
+	$(SRC_LIBM)
 
 OBJ = $(PY_O) $(addprefix $(BUILD)/, $(SRC_C:.c=.o))
 
