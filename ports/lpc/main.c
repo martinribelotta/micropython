@@ -28,7 +28,7 @@ void do_str(const char *src, mp_parse_input_kind_t input_kind) {
 }
 
 static char *stack_top;
-static char heap[2048];
+extern int _py_heap_start, _py_heap_end;
 
 int main(void) {
 
@@ -41,7 +41,7 @@ int main(void) {
         SysTick_Config(SystemCoreClock/1000);
         Board_Init();
 
-        gc_init(heap, heap + sizeof(heap));
+        gc_init(&_py_heap_start, &_py_heap_end);
 
         mp_init();
 
